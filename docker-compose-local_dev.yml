@@ -1,0 +1,19 @@
+version: '3.6'
+
+services:
+
+    mongo:
+      image: mongo:4.4
+      container_name: parser_mongo_db
+      restart: unless-stopped
+      ports:
+        - 27020:27017
+
+    parser:
+      build: .
+      command: python parser_a.py
+      restart: unless-stopped
+      volumes:
+        - .:/code
+      env_file:
+        - .env

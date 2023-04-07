@@ -1,0 +1,4 @@
+PyMongo
+requests
+motor
+pytz
