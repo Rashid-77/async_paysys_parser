@@ -2,3 +2,4 @@ PyMongo
 requests
 motor
 pytz
+httpx
