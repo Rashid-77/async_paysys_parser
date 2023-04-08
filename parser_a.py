@@ -42,11 +42,11 @@ async def parse_bin():
             logger.error(e)
 
         end_t = time.time()
-        # logger.info(f'- All queries in { (end_t - start_t):.3f} sec -\n')
+        logger.info(f'- binance { (end_t - start_t):.3f} sec -')
         
         rest_time = PARSE_TIME_PERIOD_SEC - (end_t - start_t)
         if rest_time <= 0:
-            logger.debug(f'-- longer by {(-rest_time):.1f} s')
+            logger.debug(f'- binance longer by {(-rest_time):.1f} s')
             continue
         if rest_time > PARSE_TIME_PERIOD_SEC:
             rest_time = PARSE_TIME_PERIOD_SEC
@@ -61,25 +61,30 @@ async def parse_korpay():
     while True:
         start_t = time.time()
         try:
-            logger.debug('parse_korpay()  wait "exch_bin_rdy"')
+            logger.debug('"korpay" start parse_korona()')
+            await parse_korona(countries, exchrate_korona_pay)
+
+            logger.debug('"korpay"  wait exch_bin_rdy')
             while not exch_bin_rdy:
                 await asyncio.sleep(1)
-            logger.debug('start parse_korona()')
-            await parse_korona(countries, exchrate_korona_pay)
             spreads_new = calculate_korona_binance_spread_new(
                                         exchrate_binance, exchrate_korona_pay)
-            logger.debug('calc finished')
+            logger.debug(f'{spreads_new=}')
+            logger.debug('"korpay" calc finished')
             await db.write_spread_v2(spreads_new)
-            logger.debug('written  spread_v2')
+            logger.debug('"korpay" written  spread_v2')
+
+            # for i in await db.read_allspread_v2():
+            #     logger.info(f"  {i}")
 
         except Exception as e:
             logger.error(e)
 
         end_t = time.time()
-        # logger.info(f'- All queries in { (end_t - start_t):.3f} sec -\n')
+        logger.info(f'- korpay { (end_t - start_t):.3f} sec -')
         rest_time = PARSE_TIME_PERIOD_SEC - (end_t - start_t)
         if rest_time <= 0:
-            logger.debug(f'-- longer by {(-rest_time):.1f} s')
+            logger.debug(f'- korpay longer by {(-rest_time):.1f} s')
             continue
         if rest_time > PARSE_TIME_PERIOD_SEC:
             rest_time = PARSE_TIME_PERIOD_SEC

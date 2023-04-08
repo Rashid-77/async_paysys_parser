@@ -1,4 +1,4 @@
-import time
+import asyncio
 from src.app.exch_parser.req_check_err_a import request_get_json
 from src.app.exch_parser.country_fiat_info import fiat_info
 
@@ -53,7 +53,7 @@ async def get_korona_exch_rates(country_name:str, alter_way:dict) -> tuple:
 
     pay_name = korona_dirs['pay_name']
     if json_d is None:
-        d = (f'{pay_name}-RUB-'+fiat, 'proto_err', 0, 0, 0)
+        d = (f'{pay_name}-RUB-{fiat}', 'proto_err', 0, 0, 0)
         korpay_logger.error('json is None (protocol error)')
         return d
     try:
@@ -65,14 +65,12 @@ async def get_korona_exch_rates(country_name:str, alter_way:dict) -> tuple:
             transf_commis_perc = round(transf_commis_perc, 2)
         except KeyError:
             transf_commiss = 0
-        # d = (f'{pay_name}-RUB-'+fiat, str(exch_rate), str(transf_commis_perc), 0, 0)
         d = (f'{pay_name}-{country_name}-{fiat}', str(exch_rate), str(transf_commis_perc), 0, 0)
     except Exception as e:
         frameinfo = getframeinfo(currentframe())
         korpay_logger.error(f'{traceback.format_exc()} {frameinfo.filename} {frameinfo.lineno} \n{e}')
         d = (f'{pay_name}-{country_name}-{fiat}', 'no_price', 0, 0, 0)
-        # d = (f'{pay_name}-RUB-'+fiat, 'no_price', 0, 0, 0)
-    
+
     return d
         
 
@@ -83,4 +81,4 @@ async def parse_korona(countries:tuple, data_list:list) -> list:
             d = await get_korona_exch_rates(country_name, way)
             korpay_logger.info(d)
             data_list.append(d)
-            time.sleep(4)
+            await asyncio.sleep(3)

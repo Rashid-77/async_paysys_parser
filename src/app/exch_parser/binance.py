@@ -38,10 +38,8 @@ async def request_binance_p2p(coin='USDT', trade_type='BUY',
         'fiat': fiat,
         'tradeType': trade_type,
     }
-    bin_logger.debug(f' {json_data=}')
     try:
         json_d = await request_post_json('https://p2p.binance.com/bapi/c2c/v2/friendly/c2c/adv/search', json_post=json_data)
-        bin_logger.debug(f'{json_d=}')
     except Exception as e:
         frameinfo = getframeinfo(currentframe())
         bin_logger.error(f'{traceback.format_exc()} {frameinfo.filename} {frameinfo.lineno} \n{e}')

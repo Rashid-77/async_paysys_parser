@@ -1,4 +1,5 @@
 import os
+import time
 import pymongo
 from datetime import datetime
 import pytz
@@ -64,6 +65,12 @@ class SpreadDb():
                                 })
 
 
+    async def read_allspread_v2(self):
+        ret = [tuple(i['data']) for i in self.spr2.find({})]
+        logger.debug(f'{type(ret)=}')
+        return ret
+
+
     async def read_spread_v2(self, name):
         spr = self.spr2.find_one({'_id':name})
         if spr is None:
@@ -73,60 +80,35 @@ class SpreadDb():
         return tuple(spr['data'])
 
 
-    async def write_spread_v2(self, name, rub_usd, rub_eur, rub_other,
-                                usdt_rub, dirty_spread_usd, dirty_spread_eur):
+    async def write_spread_v2(self, data):
+        start_t = time.time()
         now_msc = datetime.now(tz_msc)
         now_msc = now_msc.strftime('%Y:%m:%d %H:%M %Z')
-        spr = self.spr2.find_one({'_id':name})
-        logger.debug(f'spr2={spr}')
-        if spr is None:
-            self.spr2.insert_one({'_id': name,
-                                'data':(name,
-                                        rub_usd,
-                                        rub_eur,
-                                        rub_other,
-                                        usdt_rub,
-                                        dirty_spread_usd,
-                                        dirty_spread_eur,
-                                        now_msc,)
-                                })
-        else:
-            self.spr2.update_one({'_id':name}, 
-                               {'$set': {
-                                        'data':(name,
-                                                rub_usd,
-                                                rub_eur,
-                                                rub_other,
-                                                usdt_rub,
-                                                dirty_spread_usd,
-                                                dirty_spread_eur,
-                                                now_msc,)
-                                        }
-                                })
+        for i in data:
+            d = (i[0], i[1], i[2], i[3], i[4], i[5], i[6], now_msc,)
+            name = i[0]
+            spr = self.spr2.find_one({'_id':name})
+            if spr is None:
+                self.spr2.insert_one({'_id': name, 'data': d})
+            else:
+                self.spr2.update_one({'_id':name}, {'$set': { 'data': d}})
+        end_t = time.time()
+        logger.info(f'wr_spr2 { (end_t - start_t):.3f} sec -')
 
 
     async def write_usdt_rub(self, name, usdt_rub):
         now_msc = datetime.now(tz_msc)
         now_msc = now_msc.strftime('%Y:%m:%d %H:%M %Z')
         spr = self.usdt_rub.find_one({'_id':name})
-        logger.debug(f'usdt_rub={spr}')
+        d = (name, usdt_rub, now_msc,)
         if spr is None:
-            self.usdt_rub.insert_one({'_id': name,
-                                    'data':(name,
-                                            usdt_rub,)
-                                })
+            self.usdt_rub.insert_one({'_id': name, 'data':d})
         else:
-            self.usdt_rub.update_one({'_id':name}, 
-                                    {'$set': {
-                                            'data':(name,
-                                                    usdt_rub,)
-                                            }
-                                    })
+            self.usdt_rub.update_one({'_id':name}, {'$set': {'data': d}})
 
     
     async def read_usdt_rub(self, name):
         cur = self.usdt_rub.find_one({'_id':name})
         if cur is None:
-            return tuple(name, 'not_rdy')
-            # return tuple(name, 0, 0, 0, 0, 0, 0, 0)
+            return tuple(name, 'not_rdy', 0)
         return tuple(cur['data'])
