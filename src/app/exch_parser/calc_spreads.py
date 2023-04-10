@@ -20,6 +20,10 @@ def calculate_korona_binance_spread(binance_data:list, fiat_transfer_name:list) 
         if 'usd' in s.lower():
             return True
         return False
+    
+    def get_fiat_name(d:str):
+        return d[0].split('-')[2]
+
     logger.info('----')
     spreads =[]
     usdt_rub_rate = try_str_to_float(list(binance_data[-1])[1])
@@ -27,20 +31,25 @@ def calculate_korona_binance_spread(binance_data:list, fiat_transfer_name:list) 
     for i in range(len(fiat_transfer_name)):
         f = list(fiat_transfer_name)[i]
         b = list(binance_data)[i]
-        
+        logger.debug(f'{f=}')
         if is_fiat_usd(f[0]):
             rate2 = '?'
             spread = calc_spread_without_usd_usdt_conv(
                     RUB_TO_BE_TRANSFERED, f[1], usdt_rub_rate)
         else:
+            fiat_name = get_fiat_name(f)
+            for j, bd in enumerate(binance_data):
+                if fiat_name in bd[0]:
+                    b = list(binance_data)[j]
+                    break
+            logger.debug(f'{b=}')
             rate2 = try_str_to_float(b[1])
             spread = calc_clear_spread(
                     RUB_TO_BE_TRANSFERED, f[1], b[1], usdt_rub_rate)
         li = f[0].split('-')
+        logger.debug(f'{li=}')
         pay_name = li[0]
-        coin1 = li[1]
-        coin2 = li[2]
-        coin3 = b[0].split('-')[2]
+        coin1, coin2, coin3 = li[1], li[2], b[0].split('-')[2]
         rate1 = try_str_to_float(f[1])
         rate3 = try_str_to_float(usdt_rub_rate)
         spr = (f'{pay_name}-{coin1}-{coin2}-{coin3}', \

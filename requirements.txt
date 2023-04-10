@@ -3,3 +3,4 @@ requests
 motor
 pytz
 httpx
+beautifulsoup4

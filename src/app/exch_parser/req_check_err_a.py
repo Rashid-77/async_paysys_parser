@@ -11,9 +11,15 @@ logger.info("\nProgram started")
 REQ_TIMEOUT = 30
 
 
+async def request_get(url, headers=None):
+    async with httpx.AsyncClient(timeout=Timeout(REQ_TIMEOUT)) as client:
+        response = await client.get(url, headers=headers)
+    return response
+
+
 async def request_get_json(url, headers=None, logger=None):
     async with httpx.AsyncClient(timeout=Timeout(REQ_TIMEOUT)) as client:
-            response = await client.get(url, headers=headers)
+        response = await client.get(url, headers=headers)
     return process_err(url, response)
 
 
