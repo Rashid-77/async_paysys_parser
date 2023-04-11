@@ -20,19 +20,14 @@ async def get_paysend_exch_rates(url):
         'User-Agent': 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 '
                       '(KHTML, like Gecko) Chrome/77.0.3865.90 Safari/537.36'}
     
-    # response = await request_get_json(url, headers=header)
-    import requests
-    response = requests.get(url, headers=header)
-    logger.debug(f'{response.status_code=}')
-    logger.debug(f'{response.text=}')
+    response = await request_get(url, headers=header)
     if response.status_code != 200:
-        logger.error(f'response =  {response.status_code}')
+        logger.error(f'response={response.status_code}')
         return None
     
     soup = Bs(response.text, 'html.parser')
     section = Bs(str(soup), 'html.parser')
     rate_content = section.find('span', class_='foo')
-    logger.debug(f'{rate_content=}')
 
     temp  = rate_content.contents[0]
     temp = str(temp).split('=')[1]

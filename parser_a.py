@@ -33,6 +33,7 @@ async def parse_bin():
         exch_bin_rdy = False
 
         try:
+            logger.debug('"bin" start parse_bin_p2p()')
             await get_binance_p2p(exchrate_binance)
             for i in exchrate_binance:
                 if i[0] == 'bin-USDT-RUB':
@@ -176,8 +177,8 @@ if __name__ == '__main__':
     loop = asyncio.get_event_loop()
     tasks = [
         loop.create_task(parse_bin()), 
-        # loop.create_task(parse_korona_pay()), 
-        # loop.create_task(parse_unistr_pay()), 
+        loop.create_task(parse_korona_pay()), 
+        loop.create_task(parse_unistr_pay()), 
         loop.create_task(parse_paysend_pay()), 
     ]
     wait_tasks = asyncio.wait(tasks)

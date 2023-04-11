@@ -1,4 +1,3 @@
-# import requests
 import json
 import httpx
 from httpx import Timeout
@@ -13,22 +12,22 @@ REQ_TIMEOUT = 30
 
 async def request_get(url, headers=None):
     async with httpx.AsyncClient(timeout=Timeout(REQ_TIMEOUT)) as client:
-        response = await client.get(url, headers=headers)
+        response = await client.get(url, headers=headers, 
+                                        follow_redirects=True)
     return response
 
 
 async def request_get_json(url, headers=None, logger=None):
     async with httpx.AsyncClient(timeout=Timeout(REQ_TIMEOUT)) as client:
-        response = await client.get(url, headers=headers)
+        response = await client.get(url, headers=headers,
+                                        follow_redirects=True)
     return process_err(url, response)
 
 
 async def request_post_json(url, json_post, headers=None):
-    logger.debug('--> request_post_json()')
-    logger.debug(f' {url=}')
     async with httpx.AsyncClient(timeout=Timeout(REQ_TIMEOUT)) as client:
-        response = await client.post(url, json=json_post, headers=headers)
-        logger.debug(f' {response=}')
+        response = await client.post(url, json=json_post, headers=headers, 
+                                                    follow_redirects=True)
     return process_err(url, response)
 
 
