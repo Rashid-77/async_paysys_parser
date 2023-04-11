@@ -3,8 +3,6 @@ import os
 from src.app.exch_parser.req_check_err_a import request_get_json
 from src.app.exch_parser.country_fiat_info import fiat_info
 
-import traceback
-from inspect import currentframe, getframeinfo
 from src.logger import get_logger
 
 logger = get_logger('unistr', 'parser', 'unistr')
@@ -58,8 +56,7 @@ async def get_unistream_exch_rates(country_name:str, alter_way:dict, token:str) 
         exch_rate = round(exch_rate, 5) if fiat == 'UZS' else  round(exch_rate, 2)
         d = (f'{pay_name}-{country_name}-{fiat}', str(exch_rate), str(acceptedTotalFee), 0, 0)
     except Exception as e:
-        frameinfo = getframeinfo(currentframe())
-        logger.error(f'{traceback.format_exc()} {frameinfo.filename} {frameinfo.lineno} \n{e}')
+        logger.error(e)
         d = (f'{pay_name}-{country_name}-{fiat}', 'no_price', 0, 0, 0)
         clear_token()
     return d

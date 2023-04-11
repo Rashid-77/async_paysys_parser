@@ -29,9 +29,7 @@ class SpreadDb():
 
 
     async def read_allspread_v1(self):
-        ret = [tuple(i['data']) for i in self.spr1.find({})]
-        # logger.debug(f'{type(ret)=}')
-        return ret
+        return [tuple(i['data']) for i in self.spr1.find({})]
 
 
     async def read_spread_v1(self, name):
@@ -57,34 +55,9 @@ class SpreadDb():
         end_t = time.time()
         logger.info(f'wr_spr2 { (end_t - start_t):.3f} sec -')
 
-            # spr = self.spr1.find_one({'_id':name})
-            # logger.debug(f'spr1={spr}')
-            # if spr is None:
-            #     self.spr1.insert_one({'_id': name,
-            #                         'data':(name,
-            #                                 rub_val_rate,
-            #                                 val_usdt_rate,
-            #                                 usdt_rub_rate,
-            #                                 spread,
-            #                                 now_msc,)
-            #                         })
-            # else:
-            #     self.spr1.update_one({'_id':name}, 
-            #                     {'$set': {
-            #                                 'data':(name,
-            #                                         rub_val_rate,
-            #                                         val_usdt_rate,
-            #                                         usdt_rub_rate,
-            #                                         spread,
-            #                                         now_msc,)
-            #                                 }
-            #                         })
-
 
     async def read_allspread_v2(self):
-        ret = [tuple(i['data']) for i in self.spr2.find({})]
-        # logger.debug(f'{type(ret)=}')
-        return ret
+        return [tuple(i['data']) for i in self.spr2.find({})]
 
 
     async def read_spread_v2(self, name):
@@ -92,7 +65,6 @@ class SpreadDb():
         if spr is None:
             return tuple(name, 'not_rdy', 'not_rdy', 'not_rdy', 
                          'not_rdy', 'not_rdy', 'not_rdy', 'not_rdy')
-            # return tuple(name, 0, 0, 0, 0, 0, 0, 0)
         return tuple(spr['data'])
 
 
